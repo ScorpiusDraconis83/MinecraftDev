@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -119,7 +119,13 @@ object LocalVariables {
 
         for (parameter in method.parameterList.parameters) {
             val mixinName = if (argsOnly) "var$argsIndex" else parameter.name
-            args += SourceLocalVariable(parameter.name, parameter.type, argsIndex, mixinName = mixinName)
+            args += SourceLocalVariable(
+                parameter.name,
+                parameter.type,
+                argsIndex,
+                mixinName = mixinName,
+                variable = parameter
+            )
             argsIndex++
             if (parameter.isDoubleSlot) {
                 argsIndex++
@@ -207,7 +213,12 @@ object LocalVariables {
                         localsHere = localsHere.copyOf(localIndex + 1)
                     }
                     val name = instruction.variable.name ?: return
-                    localsHere[localIndex] = SourceLocalVariable(name, instruction.variable.type, localIndex)
+                    localsHere[localIndex] = SourceLocalVariable(
+                        name,
+                        instruction.variable.type,
+                        localIndex,
+                        variable = instruction.variable
+                    )
                     if (instruction.variable.isDoubleSlot && localIndex + 1 < localsHere.size) {
                         localsHere[localIndex + 1] = null
                     }
@@ -850,11 +861,16 @@ object LocalVariables {
         }
     }
 
+    /**
+     * Represents a local variable in source code and its probable relationship to the bytecode. Don't store instances
+     * of this class.
+     */
     data class SourceLocalVariable(
         val name: String,
         val type: PsiType,
         val index: Int,
         val mixinName: String = name,
+        val variable: PsiVariable? = null,
         val implicitLoadCountBefore: Int = 0,
         val implicitLoadCountAfter: Int = 0,
         val implicitStoreCountBefore: Int = 0,

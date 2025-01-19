@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -147,6 +147,8 @@ class MixinConfig(private val project: Project, private var json: JsonObject) {
     }
 
     private fun reformat() {
+        if(json.containingFile.name.endsWith(".json5")) return
+
         json = CodeStyleManager.getInstance(project).reformat(json) as JsonObject
         file?.let { file ->
             val psiFile = PsiManager.getInstance(project).findFile(file) as? JsonFile ?: return

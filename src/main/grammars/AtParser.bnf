@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -38,7 +38,7 @@
 at_file ::= line*
 
 private line ::= !<<eof>> entry? COMMENT? end_line
-private end_line ::= crlf | <<eof>>
+private end_line ::= CRLF | <<eof>>
 
 entry ::= keyword class_name line_value? {
     mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtEntryImplMixin"

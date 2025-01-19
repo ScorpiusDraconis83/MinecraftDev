@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -45,16 +45,15 @@ import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
 import com.intellij.util.xml.DomManager
 import java.nio.file.Path
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 import org.jetbrains.idea.maven.execution.MavenRunConfiguration
 import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
-import org.jetbrains.idea.maven.project.importing.MavenImportingManager
 
 private val pluginVersions by lazy {
     runBlocking {
         getVersionJson<Map<String, String>>("maven.json")
+            .mapKeys { (k, _) -> k.replace('-', '_') }
     }
 }
 
@@ -174,17 +173,10 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
         get() = MCDevBundle("creator.step.maven.import_maven.description")
 
     override fun perform(project: Project) {
-        val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory).resolve("pom.xml"), true)
-            ?: return
-        val promise = invokeAndWait {
-            if (project.isDisposed || !project.isInitialized) {
-                notifyCreatedProjectNotOpened()
-                return@invokeAndWait null
-            }
-            MavenImportingManager.getInstance(project).linkAndImportFile(pomFile)
-        } ?: return
-
-        promise.finishPromise.blockingGet(Int.MAX_VALUE, TimeUnit.SECONDS)
+        if (project.isDisposed || !project.isInitialized) {
+            notifyCreatedProjectNotOpened()
+            return
+        }
 
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         addRunTaskConfiguration(project, buildSystemProps, "package")
@@ -204,6 +196,7 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
         val runConfiguration = mavenConfigFactory.createConfiguration(runConfigName, templateConfig)
             as MavenRunConfiguration
         runConfiguration.runnerParameters.goals.add(task)
+        runConfiguration.runnerParameters.workingDirPath = context.projectDirectory.toString()
 
         runConfiguration.isAllowRunningInParallel = false
 

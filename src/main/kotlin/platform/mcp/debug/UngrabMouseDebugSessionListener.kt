@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -41,7 +41,7 @@ class UngrabMouseDebugSessionListener(private val process: DebugProcessImpl) : X
 
         val frameProxy = suspendContextImpl.frameProxy ?: return
         val debugProcess = suspendContextImpl.debugProcess
-        val virtualMachine = debugProcess.virtualMachineProxy as? VirtualMachineProxyImpl ?: return
+        val virtualMachine = debugProcess.virtualMachineProxy
         val evaluationContext = EvaluationContextImpl(suspendContextImpl, frameProxy)
 
         val mouseClass = virtualMachine.classesByName("org.lwjgl.input.Mouse")?.singleOrNull() as? ClassType

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.reference.target.FieldDefinitionReference
+import com.demonwav.mcdev.platform.mixin.reference.target.MethodDefinitionReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.insideAnnotationAttribute
@@ -54,6 +56,26 @@ class MixinReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             TargetReference.ELEMENT_PATTERN,
             TargetReference,
+        )
+
+        // Accessor references
+        registrar.registerReferenceProvider(
+            AccessorReference.ELEMENT_PATTERN,
+            AccessorReference,
+        )
+        registrar.registerReferenceProvider(
+            InvokerReference.ELEMENT_PATTERN,
+            InvokerReference,
+        )
+
+        // Definition references
+        registrar.registerReferenceProvider(
+            FieldDefinitionReference.ELEMENT_PATTERN,
+            FieldDefinitionReference,
+        )
+        registrar.registerReferenceProvider(
+            MethodDefinitionReference.ELEMENT_PATTERN,
+            MethodDefinitionReference,
         )
     }
 }

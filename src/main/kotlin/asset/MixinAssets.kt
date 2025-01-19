@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,4 +27,6 @@ object MixinAssets : Assets() {
 
     val MIXIN_CLASS_ICON = loadIcon("/assets/icons/mixin/mixin_class_gutter.png")
     val MIXIN_CLASS_ICON_DARK = loadIcon("/assets/icons/mixin/mixin_class_gutter_dark.png")
+
+    val MIXIN_MARK = loadIcon("/assets/icons/mixin/mixin_mark.svg")
 }

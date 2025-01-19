@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -102,7 +102,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
             action()
         } else if (!project.isDisposed) {
             StartupManager.getInstance(project).runAfterOpened {
-                ApplicationManager.getApplication().invokeLater(action, project.disposed)
+                WriteAction.runAndWait<Throwable>(action)
             }
         }
     }

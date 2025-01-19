@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,13 +25,12 @@ import com.demonwav.mcdev.facet.MinecraftFacetDetector
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mixin.config.MixinConfig
+import com.demonwav.mcdev.platform.mixin.config.MixinConfigFileType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.nullable
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
-import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.fileTypes.FileTypes
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -54,19 +53,19 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
     override val icon: Icon? = null
 
     companion object {
-        private val mixinFileType by lazy {
-            FileTypeManager.getInstance().findFileTypeByName("Mixin Configuration") ?: FileTypes.UNKNOWN
-        }
+        private val mixinFileTypes = listOf(MixinConfigFileType.Json, MixinConfigFileType.Json5)
 
         fun getMixinConfigs(
             project: Project,
             scope: GlobalSearchScope,
         ): Collection<MixinConfig> {
-            return FileTypeIndex.getFiles(mixinFileType, scope)
-                .mapNotNull {
-                    (PsiManager.getInstance(project).findFile(it) as? JsonFile)?.topLevelValue as? JsonObject
+            return mixinFileTypes
+                .flatMap { FileTypeIndex.getFiles(it, scope) }
+                .mapNotNull { file ->
+                    (PsiManager.getInstance(project).findFile(file) as? JsonFile)?.topLevelValue as? JsonObject
+                }.map { jsonObject ->
+                    MixinConfig(project, jsonObject)
                 }
-                .map { MixinConfig(project, it) }
         }
 
         fun getAllMixinClasses(
@@ -93,3 +92,4 @@ class MixinModule(facet: MinecraftFacet) : AbstractModule(facet) {
         }
     }
 }
+

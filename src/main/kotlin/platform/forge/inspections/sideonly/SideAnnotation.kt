@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,6 +57,12 @@ data class SideAnnotation(
             SideAnnotation(
                 "net.minecraftforge.api.distmarker.OnlyIn",
                 "net.minecraftforge.api.distmarker.Dist",
+                "CLIENT",
+                "DEDICATED_SERVER",
+            ),
+            SideAnnotation(
+                "net.neoforged.api.distmarker.OnlyIn",
+                "net.neoforged.api.distmarker.Dist",
                 "CLIENT",
                 "DEDICATED_SERVER",
             ),

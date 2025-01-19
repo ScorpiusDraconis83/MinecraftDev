@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -35,6 +35,8 @@ class MixinFoldingSettings : PersistentStateComponent<MixinFoldingSettings.State
         var foldInvokerMethodCalls: Boolean = true,
         var foldAccessorCasts: Boolean = true,
         var foldAccessorMethodCalls: Boolean = false,
+        var foldDefinitions: Boolean = true,
+        var foldDefinitionFieldsAndMethods: Boolean = true,
     )
 
     private var state = State()

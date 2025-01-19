@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -81,7 +81,7 @@ class MixinConfigImportOptimizer : ImportOptimizer {
         }
     }
 
-    override fun supports(file: PsiFile) = file is JsonFile && file.fileType == MixinConfigFileType
+    override fun supports(file: PsiFile) = file is JsonFile && file.fileType is MixinConfigFileType
 
     override fun processFile(file: PsiFile): Runnable {
         if (file !is JsonFile) {

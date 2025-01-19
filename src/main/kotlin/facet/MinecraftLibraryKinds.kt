@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -31,21 +31,25 @@ import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.platform.neoforge.framework.NEOFORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.velocity.framework.VELOCITY_LIBRARY_KIND
 
-val MINECRAFT_LIBRARY_KINDS = setOf(
-    BUKKIT_LIBRARY_KIND,
-    SPIGOT_LIBRARY_KIND,
-    PAPER_LIBRARY_KIND,
-    SPONGE_LIBRARY_KIND,
-    FORGE_LIBRARY_KIND,
-    FABRIC_LIBRARY_KIND,
-    ARCHITECTURY_LIBRARY_KIND,
-    MCP_LIBRARY_KIND,
-    MIXIN_LIBRARY_KIND,
-    BUNGEECORD_LIBRARY_KIND,
-    WATERFALL_LIBRARY_KIND,
-    VELOCITY_LIBRARY_KIND,
-    ADVENTURE_LIBRARY_KIND,
-)
+val MINECRAFT_LIBRARY_KINDS by lazy {
+    setOf(
+        BUKKIT_LIBRARY_KIND,
+        SPIGOT_LIBRARY_KIND,
+        PAPER_LIBRARY_KIND,
+        SPONGE_LIBRARY_KIND,
+        FORGE_LIBRARY_KIND,
+        NEOFORGE_LIBRARY_KIND,
+        FABRIC_LIBRARY_KIND,
+        ARCHITECTURY_LIBRARY_KIND,
+        MCP_LIBRARY_KIND,
+        MIXIN_LIBRARY_KIND,
+        BUNGEECORD_LIBRARY_KIND,
+        WATERFALL_LIBRARY_KIND,
+        VELOCITY_LIBRARY_KIND,
+        ADVENTURE_LIBRARY_KIND,
+    )
+}

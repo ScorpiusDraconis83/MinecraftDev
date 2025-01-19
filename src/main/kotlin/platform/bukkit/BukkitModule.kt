@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,16 +21,14 @@
 package com.demonwav.mcdev.platform.bukkit
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.insight.generation.GenerationData
+import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.inspection.IsCancelled
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.platform.bukkit.util.PaperConstants
 import com.demonwav.mcdev.util.SourceType
-import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
@@ -44,27 +42,33 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.util.application
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
 
 class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
+    // Light test cases only support a single source content root, so we mix sources and resources under unit test mode
+    private val pluginYmlSourceType = if (application.isUnitTestMode) SourceType.SOURCE else SourceType.RESOURCE
+
     var pluginYml by nullable {
         if (moduleType is PaperModuleType) {
-            val paperPlugin = facet.findFile("paper-plugin.yml", SourceType.RESOURCE)
+            val paperPlugin = facet.findFile("paper-plugin.yml", pluginYmlSourceType)
             if (paperPlugin != null) {
                 return@nullable paperPlugin
             }
         }
 
-        facet.findFile("plugin.yml", SourceType.RESOURCE)
+        facet.findFile("plugin.yml", pluginYmlSourceType)
     }
         private set
 
     override val type: PlatformType = type.platformType
 
     override val moduleType: T = type
+
+    override val eventListenerGenSupport: EventListenerGenerationSupport? = BukkitEventListenerGenerationSupport()
 
     private val pluginParentClasses = listOf(
         BukkitConstants.PLUGIN,
@@ -80,44 +84,6 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
         "Parameter is not a subclass of org.bukkit.event.Event\n" +
             "Compiling and running this listener may result in a runtime exception"
-
-    override fun doPreEventGenerate(psiClass: PsiClass, data: GenerationData?) {
-        if (!psiClass.extendsOrImplements(BukkitConstants.LISTENER_CLASS)) {
-            psiClass.addImplements(BukkitConstants.LISTENER_CLASS)
-        }
-    }
-
-    override fun generateEventListenerMethod(
-        containingClass: PsiClass,
-        chosenClass: PsiClass,
-        chosenName: String,
-        data: GenerationData?,
-    ): PsiMethod? {
-        val bukkitData = data as BukkitGenerationData
-
-        val method = generateBukkitStyleEventListenerMethod(
-            chosenClass,
-            chosenName,
-            project,
-            BukkitConstants.HANDLER_ANNOTATION,
-            bukkitData.isIgnoreCanceled,
-        ) ?: return null
-
-        if (bukkitData.eventPriority != "NORMAL") {
-            val list = method.modifierList
-            val annotation = list.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) ?: return method
-
-            val value = JavaPsiFacade.getElementFactory(project)
-                .createExpressionFromText(
-                    BukkitConstants.EVENT_PRIORITY_CLASS + "." + bukkitData.eventPriority,
-                    annotation,
-                )
-
-            annotation.setDeclaredAttributeValue("priority", value)
-        }
-
-        return method
-    }
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {
         val method = expression.findContainingMethod() ?: return null

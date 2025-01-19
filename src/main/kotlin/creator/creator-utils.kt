@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,17 +26,23 @@ import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.starters.local.GeneratorTemplateFile
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.ObservableProperty
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.RecursionManager
 import java.time.ZonedDateTime
+import javax.swing.JComponent
 
 val NewProjectWizardStep.gitEnabled
     get() = data.getUserData(GitNewProjectWizardData.KEY)!!.git
@@ -160,3 +166,18 @@ fun notifyCreatedProjectNotOpened() {
         NotificationType.ERROR,
     ).notify(null)
 }
+
+val WizardContext.contentPanel: JComponent?
+    get() = this.getUserData(AbstractWizard.KEY)?.contentPanel
+
+val WizardContext.modalityState: ModalityState
+    get() {
+        ProgressManager.checkCanceled()
+        val contentPanel = contentPanel
+        if (contentPanel == null) {
+            thisLogger().error("Wizard content panel is null, using default modality state")
+            return ModalityState.defaultModalityState()
+        }
+
+        return ModalityState.stateForComponent(contentPanel)
+    }

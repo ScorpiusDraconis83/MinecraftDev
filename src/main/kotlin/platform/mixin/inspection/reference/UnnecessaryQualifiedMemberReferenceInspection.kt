@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,7 +34,6 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiArrayInitializerMemberValue
-import com.intellij.psi.PsiLiteral
 
 class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection("method") {
 
@@ -51,8 +50,8 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         }
 
         when (value) {
-            is PsiLiteral -> checkMemberReference(value, holder)
             is PsiArrayInitializerMemberValue -> value.initializers.forEach { checkMemberReference(it, holder) }
+            else -> checkMemberReference(value, holder)
         }
     }
 

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,7 +28,6 @@ import com.intellij.lang.ParserDefinition
 import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
-import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
@@ -36,7 +35,6 @@ import com.intellij.psi.tree.TokenSet
 class AtParserDefinition : ParserDefinition {
 
     override fun createLexer(project: Project) = AtLexerAdapter()
-    override fun getWhitespaceTokens() = WHITE_SPACES
     override fun getCommentTokens() = COMMENTS
     override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
     override fun createParser(project: Project) = AtParser()
@@ -49,7 +47,6 @@ class AtParserDefinition : ParserDefinition {
             ?: ParserDefinition.SpaceRequirements.MUST_NOT
 
     companion object {
-        private val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
         private val COMMENTS = TokenSet.create(AtTypes.COMMENT)
 
         private val FILE = IFileElementType(Language.findInstance(AtLanguage::class.java))

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,6 +34,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import org.gradle.tooling.model.idea.IdeaModule
 import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData
 import org.jetbrains.plugins.gradle.service.project.ProjectResolverContext
+import org.jetbrains.plugins.gradle.util.gradleIdentityPath
 
 object McpModelFG3Handler : McpModelDataHandler {
 
@@ -68,9 +69,10 @@ object McpModelFG3Handler : McpModelDataHandler {
             forgeVersion,
         )
 
-        val gradleProjectPath = gradleModule.gradleProject.projectIdentifier.projectPath
-        val suffix = if (gradleProjectPath.endsWith(':')) "" else ":"
-        val taskName = gradleProjectPath + suffix + data.taskName
+        // gradleIdentityPath makes it work with composite builds
+        val identityPath = node.data.gradleIdentityPath
+        // But ignore it if it is the root project, as taskName already starts with a colon
+        val taskName = if (identityPath == ":") data.taskName else identityPath + ':' + data.taskName
 
         val ats = data.accessTransformers
         if (ats != null && ats.isNotEmpty()) {

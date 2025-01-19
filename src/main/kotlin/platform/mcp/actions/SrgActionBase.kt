@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -37,11 +37,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.createSmartPointer
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 import java.awt.Point
 import javax.swing.JComponent
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 
 abstract class SrgActionBase : AnAction() {
 
@@ -88,9 +89,10 @@ abstract class SrgActionBase : AnAction() {
 
             val project = e.project ?: return
 
+            val elementPointer = getDataFromActionEvent(e)?.element?.createSmartPointer()
+            val editor = getDataFromActionEvent(e)?.editor
             invokeLater {
-                val element = getDataFromActionEvent(e)?.element
-                val editor = getDataFromActionEvent(e)?.editor
+                val element = elementPointer?.element
                 if (element != null && editor != null) {
                     val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
                     val at = RelativePoint(
@@ -119,7 +121,7 @@ abstract class SrgActionBase : AnAction() {
         }
 
         fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
-            val escapedText = StringEscapeUtils.escapeHtml(text)
+            val escapedText = StringEscapeUtils.escapeHtml4(text)
             val balloon = JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(escapedText, null, LightColors.SLIGHTLY_GREEN, null)
                 .setHideOnAction(true)

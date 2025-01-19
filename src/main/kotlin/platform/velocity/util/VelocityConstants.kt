@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,6 +26,7 @@ object VelocityConstants {
 
     const val PLUGIN_ANNOTATION = "com.velocitypowered.api.plugin.Plugin"
     const val SUBSCRIBE_ANNOTATION = "com.velocitypowered.api.event.Subscribe"
+    const val POST_ORDER = "com.velocitypowered.api.event.PostOrder"
     const val KYORI_TEXT_COLOR = "net.kyori.text.format.TextColor"
 
     val API_2 = SemanticVersion.release(2)

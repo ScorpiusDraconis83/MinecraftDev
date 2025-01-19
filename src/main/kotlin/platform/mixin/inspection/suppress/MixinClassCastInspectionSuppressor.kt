@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -54,7 +54,8 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         // check instanceof
         if (element is PsiInstanceOfExpression) {
             val castType = element.checkType?.type
-                ?: (element.pattern as? PsiTypeTestPattern)?.checkType?.type
+                ?: (element.pattern as? PsiTypeTestPattern)
+                    ?.checkType?.type
                 ?: return false
             var operand = PsiUtil.skipParenthesizedExprDown(element.operand) ?: return false
             while (operand is PsiTypeCastExpression) {

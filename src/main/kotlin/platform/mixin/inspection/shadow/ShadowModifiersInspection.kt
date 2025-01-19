@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -102,6 +102,11 @@ class ShadowModifiersInspection : MixinInspection() {
 
             // TODO: Would it make sense to apply the @Final check to methods?
             if (member !is PsiField) {
+                return
+            }
+
+            // @Final annotation doesn't apply to members that are initialized in the mixin class
+            if (member.hasInitializer()) {
                 return
             }
 

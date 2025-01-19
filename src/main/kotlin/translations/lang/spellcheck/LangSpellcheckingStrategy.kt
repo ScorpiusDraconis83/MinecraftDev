@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,13 +22,14 @@ package com.demonwav.mcdev.translations.lang.spellcheck
 
 import com.demonwav.mcdev.translations.lang.MCLangLanguage
 import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
+import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.spellchecker.tokenizer.SpellcheckingStrategy
 import com.intellij.spellchecker.tokenizer.Tokenizer
 import com.intellij.spellchecker.tokenizer.TokenizerBase
 
-class LangSpellcheckingStrategy : SpellcheckingStrategy() {
+class LangSpellcheckingStrategy : SpellcheckingStrategy(), DumbAware {
     private val langCommentTokenizer = LangCommentTokenizer()
     private val langKeyTokenizer = TokenizerBase<LeafPsiElement>(LangKeySplitter)
 

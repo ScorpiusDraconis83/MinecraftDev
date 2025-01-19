@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.OPERATION
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findModule
@@ -150,11 +151,20 @@ fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType
         returnType
     }
 
-    // TODO: Can we do this without looking up the PsiClass?
-    val psiClass =
-        JavaPsiFacade.getInstance(project).findClass(CALLBACK_INFO_RETURNABLE, GlobalSearchScope.allScope(project))
-            ?: return null
-    return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
+    return JavaPsiFacade.getElementFactory(project)
+        .createTypeFromText("$CALLBACK_INFO_RETURNABLE<${boxedType.canonicalText}>", context)
+}
+
+fun mixinExtrasOperationType(context: PsiElement, type: PsiType): PsiType? {
+    val project = context.project
+    val boxedType = if (type is PsiPrimitiveType) {
+        type.getBoxedType(context) ?: return null
+    } else {
+        type
+    }
+
+    return JavaPsiFacade.getElementFactory(project)
+        .createTypeFromText("$OPERATION<${boxedType.canonicalText}>", context)
 }
 
 fun isAssignable(left: PsiType, right: PsiType, allowPrimitiveConversion: Boolean = true): Boolean {
@@ -237,3 +247,6 @@ fun isMixinEntryPoint(element: PsiElement?): Boolean {
     }
     return false
 }
+
+val PsiElement.isFabricMixin: Boolean get() =
+    JavaPsiFacade.getInstance(project).findClass(MixinConstants.Classes.FABRIC_UTIL, resolveScope) != null

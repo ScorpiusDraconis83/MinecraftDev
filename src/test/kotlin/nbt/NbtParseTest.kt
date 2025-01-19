@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -35,9 +35,9 @@ import com.demonwav.mcdev.nbt.tags.TagLong
 import com.demonwav.mcdev.nbt.tags.TagLongArray
 import com.demonwav.mcdev.nbt.tags.TagShort
 import com.demonwav.mcdev.nbt.tags.TagString
-import com.intellij.util.io.inputStream
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.inputStream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

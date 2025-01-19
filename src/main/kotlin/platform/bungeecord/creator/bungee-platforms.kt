@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,6 +28,8 @@ import com.demonwav.mcdev.util.SemanticVersion
 class BungeeMainPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatformStep(parent, PlatformType.BUNGEECORD) {
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
         BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"),
+        // Seems to be required since 1.21
+        BuildRepository("Minecraft Libraries", "https://libraries.minecraft.net/"),
     )
 
     override fun getDependencies(mcVersion: SemanticVersion) = listOf(

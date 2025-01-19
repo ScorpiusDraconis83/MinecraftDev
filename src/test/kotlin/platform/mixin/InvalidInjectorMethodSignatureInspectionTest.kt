@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -98,7 +98,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 }
 
                 @Inject(method = "<init>(Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;Ljava/lang/String;)V", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for Inject">(String string, CallbackInfo ci)</error> {
+                private <error descr="Method signature does not match expected signature for Inject">void injectCtor(String string, CallbackInfo ci)</error> {
                 }
             }
             """,
@@ -122,7 +122,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             public class TestMixin {
 
                 @Inject(method = "<init>()V", at = @At("RETURN"))
-                private void injectCtorWrong<error descr="Method parameters do not match expected parameters for Inject">(MixedInOuter outer, CallbackInfo ci)</error> {
+                private <error descr="Method signature does not match expected signature for Inject">void injectCtorWrong(MixedInOuter outer, CallbackInfo ci)</error> {
                 }
 
                 @Inject(method = "<init>", at = @At("RETURN"))
@@ -130,7 +130,7 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 }
 
                 @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
-                private void injectCtor<error descr="Method parameters do not match expected parameters for Inject">(MixedInOuter outer, String string, CallbackInfo ci)</error> {
+                private <error descr="Method signature does not match expected signature for Inject">void injectCtor(MixedInOuter outer, String string, CallbackInfo ci)</error> {
                 }
 
                 @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))

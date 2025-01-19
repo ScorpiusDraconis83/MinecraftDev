@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.util
 
+import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.PreReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
@@ -30,6 +31,7 @@ import java.net.URLDecoder
  * Each constituent part (delimited by periods in a version string) contributes
  * to the version ranking with decreasing priority from left to right.
  */
+@TemplateApi
 class SemanticVersion(
     val parts: List<VersionPart>,
     private val buildMetadata: String = "",
@@ -148,6 +150,24 @@ class SemanticVersion(
                     return PreReleasePart(version, separator, subParts, versionString)
                 }
             }
+
+            // Regular Minecraft snapshot versions e.g. 24w39a
+            fun parseMinecraftSnapshot(value: String): SemanticVersion? {
+                if (value.length != 6 || value[2] != 'w' || !value[5].isLetter()) {
+                    return null
+                }
+
+                val shortYear = value.substring(0, 2).toIntOrNull() ?: return null
+                val week = value.substring(3, 5).toIntOrNull() ?: return null
+
+                val subParts = listOf(ReleasePart(week, week.toString()), TextPart(value[5].toString()))
+                val mainPart = PreReleasePart(shortYear, 'w', subParts, value)
+                return SemanticVersion(
+                    listOf(mainPart),
+                )
+            }
+
+            parseMinecraftSnapshot(value)?.let { return it }
 
             val decodedValue = value.split('+').joinToString("+") { URLDecoder.decode(it, Charsets.UTF_8) }
             val mainPartAndMetadata = decodedValue.split("+", limit = 2)

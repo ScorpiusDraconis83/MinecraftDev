@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,9 +22,11 @@ package com.demonwav.mcdev.toml.platform.forge.inspections
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.toml.TomlElementVisitor
+import com.demonwav.mcdev.toml.platform.forge.ForgeTomlConstants
 import com.demonwav.mcdev.toml.platform.forge.ModsTomlSchema
 import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.toml.tomlType
+import com.demonwav.mcdev.toml.unquoteKey
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.findMcpModule
 import com.intellij.codeInspection.InspectionManager
@@ -52,14 +54,14 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
     override fun getStaticDescription(): String = "Checks mods.toml files for errors"
 
     override fun processFile(file: PsiFile, manager: InspectionManager): MutableList<ProblemDescriptor> {
-        if (file.virtualFile.name == ForgeConstants.MODS_TOML) {
+        if (file.virtualFile.name in ForgeTomlConstants.FILE_NAMES) {
             return super.processFile(file, manager)
         }
         return mutableListOf()
     }
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
-        if (holder.file.virtualFile.name == ForgeConstants.MODS_TOML) {
+        if (holder.file.virtualFile.name in ForgeTomlConstants.FILE_NAMES) {
             return Visitor(holder)
         }
         return PsiElementVisitor.EMPTY_VISITOR
@@ -111,6 +113,15 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                         holder.registerProblem(value, TextRange(1, endOffset), "Order $order does not exist")
                     }
                 }
+                "clientSideOnly" -> {
+                    val forgeVersion = runCatching {
+                        keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
+                    }.getOrNull()
+                    val minVersion = ForgeConstants.CLIENT_ONLY_MANIFEST_VERSION
+                    if (forgeVersion != null && forgeVersion < minVersion) {
+                        holder.registerProblem(keyValue.key, "ClientSideOnly is only available since $minVersion")
+                    }
+                }
             }
         }
 
@@ -120,7 +131,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 key.segments.indexOf(keySegment) == 1 &&
                 key.segments.first().text == "dependencies" // We are visiting a dependency table
             ) {
-                val targetId = keySegment.text
+                val targetId = keySegment.unquoteKey()
                 val isDeclaredId = keySegment.containingFile.children
                     .filterIsInstance<TomlArrayTable>()
                     .filter { it.header.key?.name == "mods" }

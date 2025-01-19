@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -49,7 +49,7 @@ class TranslationFileAnnotator : Annotator {
         if (translation.key != translation.trimmedKey) {
             annotations.newAnnotation(HighlightSeverity.WARNING, "Translation key contains whitespace at start or end.")
                 .range(element)
-                .newFix(TrimKeyIntention()).registerFix()
+                .newFix(TrimKeyIntention(element)).universal().registerFix()
                 .create()
         }
     }
@@ -58,7 +58,7 @@ class TranslationFileAnnotator : Annotator {
         val count = TranslationIndex.getTranslations(element.containingFile).count { it.key == translation.key }
         if (count > 1) {
             annotations.newAnnotation(HighlightSeverity.WARNING, "Duplicate translation keys \"${translation.key}\".")
-                .newFix(RemoveDuplicatesIntention(translation)).registerFix()
+                .newFix(RemoveDuplicatesIntention(translation, element)).universal().registerFix()
                 .create()
         }
     }
@@ -71,7 +71,7 @@ class TranslationFileAnnotator : Annotator {
         }
         val warningText = "Translation key not included in default localization file."
         annotations.newAnnotation(HighlightSeverity.WARNING, warningText)
-            .newFix(RemoveUnmatchedEntryIntention()).registerFix()
+            .newFix(RemoveUnmatchedEntryIntention(element)).universal().registerFix()
             .create()
     }
 }

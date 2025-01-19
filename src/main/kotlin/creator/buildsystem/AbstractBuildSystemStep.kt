@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -49,7 +49,7 @@ abstract class AbstractBuildSystemStep(
 
     override val self get() = this
     override val label
-        get() = MCDevBundle("creator.ui.build_system.label.generic")
+        get() = MCDevBundle("creator.ui.build_system.label")
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)

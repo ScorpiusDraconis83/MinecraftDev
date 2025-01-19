@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -23,10 +23,13 @@ package com.demonwav.mcdev.platform.mixin.config.reference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_CONFIG
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_SERIALIZED_NAME
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.SERIALIZED_NAME
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.MIXIN_EXTRAS_CONFIG
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.MIXIN_EXTRAS_CONFIG_KEY
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.MIXIN_EXTRAS_SERIALIZED_NAME
 import com.demonwav.mcdev.util.constantStringValue
-import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.reference.InspectionReference
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
@@ -48,6 +51,10 @@ object ConfigProperty : PsiReferenceProvider() {
         arrayOf(Reference(element as JsonStringLiteral))
 
     fun resolveReference(element: JsonStringLiteral): PsiElement? {
+        val name = element.value
+        customSubConfigs[name]?.let {
+            return JavaPsiFacade.getInstance(element.project).findClass(it, element.resolveScope)
+        }
         val configClass = findConfigClass(element) ?: return null
         return findProperty(configClass, element.value)
     }
@@ -55,11 +62,14 @@ object ConfigProperty : PsiReferenceProvider() {
     private fun collectVariants(context: PsiElement): Array<Any> {
         val configClass = findConfigClass(context) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
 
-        val list = ArrayList<LookupElementBuilder>()
+        val list = mutableListOf<String>()
         forEachProperty(configClass) { _, name ->
-            list.add(LookupElementBuilder.create(name))
+            list.add(name)
         }
-        return list.toArray()
+        if (configClass.qualifiedName == MIXIN_CONFIG) {
+            list.addAll(customSubConfigs.keys)
+        }
+        return list.asSequence().map { LookupElementBuilder.create(it) }.toTypedArray()
     }
 
     private fun findProperty(configClass: PsiClass, name: String): PsiField? {
@@ -73,15 +83,8 @@ object ConfigProperty : PsiReferenceProvider() {
     }
 
     private inline fun forEachProperty(configClass: PsiClass, func: (PsiField, String) -> Unit) {
-        val mixinSerializedNameClass =
-            JavaPsiFacade.getInstance(configClass.project).findClass(MIXIN_SERIALIZED_NAME, configClass.resolveScope)
-        val serializedNameName = if (mixinSerializedNameClass != null) {
-            MIXIN_SERIALIZED_NAME
-        } else {
-            SERIALIZED_NAME
-        }
         for (field in configClass.fields) {
-            val annotation = field.findAnnotation(serializedNameName)
+            val annotation = field.annotations.find { it.qualifiedName in serializedNameAnnotations }
             val name = annotation?.findDeclaredAttributeValue(null)?.constantStringValue ?: continue
             func(field, name)
         }
@@ -107,6 +110,14 @@ object ConfigProperty : PsiReferenceProvider() {
 
         // Walk to correct class
         var currentClass = mixinConfig
+
+        customSubConfigs[path.first()]?.let { newRoot ->
+            path.removeFirst()
+            currentClass =
+                JavaPsiFacade.getInstance(context.project).findClass(newRoot, context.resolveScope)
+                    ?: return null
+        }
+
         for (i in path.lastIndex downTo 0) {
             currentClass = (findProperty(currentClass, path[i])?.type as? PsiClassType)?.resolve() ?: return null
         }
@@ -127,4 +138,14 @@ object ConfigProperty : PsiReferenceProvider() {
         override fun getVariants() = collectVariants(element)
         override fun isReferenceTo(element: PsiElement) = element is PsiField && super.isReferenceTo(element)
     }
+
+    private val customSubConfigs = mapOf(
+        MIXIN_EXTRAS_CONFIG_KEY to MIXIN_EXTRAS_CONFIG
+    )
+
+    private val serializedNameAnnotations = setOf(
+        SERIALIZED_NAME,
+        MIXIN_SERIALIZED_NAME,
+        MIXIN_EXTRAS_SERIALIZED_NAME
+    )
 }

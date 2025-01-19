@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -37,6 +37,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.parentOfType
+import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
@@ -86,11 +87,11 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
                 val resolvedInsns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return@let }
                 for (insn in resolvedInsns) {
                     val locals = LocalVariables.getLocals(module, targetClass, targetMethod, insn.insn)
+                        ?.filterNotNull()
                         ?.drop(
                             Type.getArgumentTypes(targetMethod.desc).size +
                                 if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) 0 else 1,
                         )
-                        ?.filterNotNull()
                         ?.filter { it.desc != null }
                         ?: continue
                     if (commonLocalsPrefix == null) {
@@ -131,4 +132,6 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
     }
 
     override val allowCoerce = true
+
+    override val mixinExtrasExpressionContextType = ExpressionContext.Type.INJECT
 }

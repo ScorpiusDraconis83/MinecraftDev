@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.step
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.storeToData
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.onShown
@@ -72,6 +73,10 @@ abstract class AbstractMcVersionChainStep(
 ) : AbstractVersionChainStep(parent, *(listOf("Minecraft Version:") + otherLabels).toTypedArray()) {
     companion object {
         const val MINECRAFT_VERSION = 0
+    }
+
+    init {
+        storeToData()
     }
 
     override fun setupUI(builder: Panel) {

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,14 +20,17 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiTypeElement
+import com.intellij.psi.util.parentOfType
 
 class MixinClassReferenceInspection : MixinInspection() {
 
@@ -55,6 +58,11 @@ class MixinClassReferenceInspection : MixinInspection() {
 
             // Check if the reference is an accessor Mixin
             if (referencedClass.isAccessorMixin) {
+                return
+            }
+
+            val annotation = type.parentOfType<PsiAnnotation>()
+            if (annotation != null && annotation.hasQualifiedName(MixinConstants.Annotations.DYNAMIC)) {
                 return
             }
 

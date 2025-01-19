@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,7 +34,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiEditorUtil
-import com.intellij.ui.ColorChooser
+import com.intellij.ui.ColorChooserService
 import com.intellij.util.FunctionUtil
 import com.intellij.util.ui.ColorIcon
 import com.intellij.util.ui.ColorsIcon
@@ -85,7 +85,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
                 val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
 
-                val picker = ColorPicker(map, editor.component)
+                val picker = ColorPicker(map, element.project, editor.component)
                 val newColor = picker.showDialog()
                 if (newColor != null && map[newColor] != color) {
                     workElement.setColor(newColor)
@@ -149,7 +149,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             }
 
             val actionText = MCDevBundle("generate.color.choose_action")
-            val c = ColorChooser.chooseColor(psiElement.project, editor.component, actionText, color, false)
+            val c = ColorChooserService.instance.showDialog(psiElement.project, editor.component, actionText, color)
                 ?: return@handler
             when (workElement) {
                 is ULiteralExpression -> {

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,9 +57,9 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
         return null
     }
 
-    private class MyCollectVisitor(
-        private val project: Project,
-        private val clazz: ClassNode,
+    internal open class MyCollectVisitor(
+        protected val project: Project,
+        protected val clazz: ClassNode,
         mode: Mode,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {

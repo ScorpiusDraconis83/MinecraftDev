@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,14 +21,14 @@
 package com.demonwav.mcdev.translations.inspections
 
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 
-abstract class TranslationInspection : AbstractBaseJavaLocalInspectionTool() {
+abstract class TranslationInspection : LocalInspectionTool() {
     protected abstract fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor
 
     final override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {

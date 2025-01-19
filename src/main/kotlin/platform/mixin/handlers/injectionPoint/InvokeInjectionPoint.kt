@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.MemberReference
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
@@ -30,6 +31,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiForeachStatement
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
@@ -38,6 +40,28 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 abstract class AbstractInvokeInjectionPoint(private val assign: Boolean) : AbstractMethodInjectionPoint() {
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        completeExtraStringAtAttribute(editor, reference, "target")
+    }
+
+    override fun isShiftDiscouraged(shift: Int): Boolean {
+        if (shift == 0) {
+            return false
+        }
+        if (assign) {
+            // allow shifting before the INVOKE_ASSIGN
+            if (shift == -1) {
+                return false
+            }
+        } else {
+            // allow shifting after the INVOKE
+            if (shift == 1) {
+                return false
+            }
+        }
+        return true
+    }
+
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,

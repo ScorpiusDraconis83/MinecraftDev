@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,7 @@ import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
-import com.intellij.codeInsight.navigation.NavigationUtil
+import com.intellij.codeInsight.navigation.getPsiElementPopup
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -66,8 +66,14 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         val name = psiClass.name ?: return
         val targets = psiClass.mixinTargets
             .mapNotNull { it.findSourceClass(psiClass.project, psiClass.resolveScope, canDecompile = true) }
-        if (targets.isNotEmpty()) {
-            NavigationUtil.getPsiElementPopup(targets.toTypedArray<PsiElement>(), "Choose target class of $name")
+
+        val singleTarget = targets.singleOrNull()
+        if (singleTarget != null) {
+            if (singleTarget.canNavigate()) {
+                singleTarget.navigate(true)
+            }
+        } else if (targets.isNotEmpty()) {
+            getPsiElementPopup(targets.toTypedArray<PsiElement>(), "Choose target class of $name")
                 .show(RelativePoint(e))
         }
     }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,12 +20,12 @@
 
 package com.demonwav.mcdev.translations.identification
 
-import com.intellij.psi.PsiElement
+import org.jetbrains.uast.UElement
 
 data class TranslationInstance(
-    val foldingElement: PsiElement?,
+    val foldingElement: UElement?,
     val foldStart: Int,
-    val referenceElement: PsiElement?,
+    val referenceElement: UElement?,
     val key: Key,
     val text: String?,
     val required: Boolean,
@@ -44,7 +44,7 @@ data class TranslationInstance(
             MISSING, SUPERFLUOUS
         }
 
-        fun find(element: PsiElement): TranslationInstance? =
+        fun find(element: UElement): TranslationInstance? =
             TranslationIdentifier.INSTANCES
                 .firstOrNull { it.elementClass().isAssignableFrom(element.javaClass) }
                 ?.identifyUnsafe(element)

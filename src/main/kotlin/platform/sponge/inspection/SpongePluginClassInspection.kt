@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -29,6 +29,7 @@ import com.intellij.codeInsight.daemon.impl.quickfix.ModifierFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -90,7 +91,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         classIdentifier,
                         "Plugin class must have an empty constructor or an @Inject constructor.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        AddDefaultConstructorFix(aClass),
+                        *LocalQuickFix.notNullElements(LocalQuickFix.from(AddDefaultConstructorFix(aClass))),
                     )
                 }
             }
@@ -102,9 +103,11 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         ctorIdentifier,
                         "Plugin class empty constructor must not be private.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false),
-                        ModifierFix(emptyCtor, PsiModifier.PROTECTED, true, false),
-                        ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false),
+                        *LocalQuickFix.notNullElements(
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false)),
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PROTECTED, true, false)),
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false)),
+                        )
                     )
                 }
             }

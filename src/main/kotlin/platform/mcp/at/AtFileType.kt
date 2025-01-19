@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,7 +26,7 @@ import com.intellij.openapi.fileTypes.LanguageFileType
 object AtFileType : LanguageFileType(AtLanguage) {
 
     override fun getName() = "Access Transformers"
-    override fun getDescription() = "Access transformers"
+    override fun getDescription() = "Access Transformers"
     override fun getDefaultExtension() = ""
     override fun getIcon() = PlatformAssets.MCP_ICON
 }

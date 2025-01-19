@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -23,6 +23,6 @@ package com.demonwav.mcdev.platform.bukkit.framework
 import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val BUKKIT_LIBRARY_KIND: LibraryKind = libraryKind("bukkit-api")
-val SPIGOT_LIBRARY_KIND: LibraryKind = libraryKind("spigot-api")
-val PAPER_LIBRARY_KIND: LibraryKind = libraryKind("paper-api")
+val BUKKIT_LIBRARY_KIND: LibraryKind by libraryKind("bukkit-api")
+val SPIGOT_LIBRARY_KIND: LibraryKind by libraryKind("spigot-api")
+val PAPER_LIBRARY_KIND: LibraryKind by libraryKind("paper-api")

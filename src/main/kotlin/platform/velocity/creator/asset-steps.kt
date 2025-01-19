@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -103,12 +103,12 @@ class VelocityModifyMainClassStep(
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
 
-        NonProjectFileWritingAccessProvider.disableChecksDuring {
-            project.runWriteTaskInSmartMode {
+        project.runWriteTaskInSmartMode {
+            NonProjectFileWritingAccessProvider.disableChecksDuring {
                 val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true)
-                    ?: return@runWriteTaskInSmartMode
+                    ?: return@disableChecksDuring
                 val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile
-                    ?: return@runWriteTaskInSmartMode
+                    ?: return@disableChecksDuring
 
                 val psiClass = mainClassPsi.classes[0]
                 val annotation = buildString {

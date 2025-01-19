@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -42,8 +42,14 @@ class TomlSchema private constructor(
     fun topLevelKeys(isArray: Boolean): Set<String> =
         tables.filter { it.isArray == isArray }.mapTo(mutableSetOf()) { it.name }
 
+    fun topLevelEntries(isArray: Boolean): Set<TomlSchemaEntry> =
+        tables.filter { it.isArray == isArray }.flatMapTo(mutableSetOf()) { it.entries }
+
     fun keysForTable(tableName: String): Set<String> =
         tableSchema(tableName)?.entries?.mapTo(mutableSetOf()) { it.key }.orEmpty()
+
+    fun entriesForTable(tableName: String): Set<TomlSchemaEntry> =
+        tableSchema(tableName)?.entries.orEmpty()
 
     fun tableEntry(tableName: String, key: String): TomlSchemaEntry? =
         tableSchema(tableName)?.entries?.find { it.key == key }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -87,7 +87,9 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_3_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_20_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_20_6_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_20_CONFIG_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_21_CONFIG_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_BUILD_GRADLE_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_GRADLE_PROPERTIES_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_SETTINGS_GRADLE_TEMPLATE))
@@ -109,6 +111,24 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         FileTemplateGroupDescriptor("Mixin", PlatformAssets.MIXIN_ICON).let { mixinGroup ->
             group.addTemplate(mixinGroup)
             mixinGroup.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK))
+        }
+
+        FileTemplateGroupDescriptor("NeoForge", PlatformAssets.NEOFORGE_ICON).let { forgeGroup ->
+            group.addTemplate(forgeGroup)
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MIXINS_JSON_TEMPLATE, PlatformAssets.NEOFORGE_ICON))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_CONFIG_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_BUILD_GRADLE_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_GRADLE_PROPERTIES_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_SETTINGS_GRADLE_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MODS_TOML_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_PACK_MCMETA_TEMPLATE))
+
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_BLOCK_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_ITEM_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_PACKET_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_ENCHANTMENT_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MOB_EFFECT_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Common", PlatformAssets.MINECRAFT_ICON).let { commonGroup ->
@@ -196,7 +216,9 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FG3_1_19_MAIN_CLASS_TEMPLATE = "Forge (1.19+) Main Class.java"
         const val FG3_1_19_3_MAIN_CLASS_TEMPLATE = "Forge (1.19.3+) Main Class.java"
         const val FG3_1_20_MAIN_CLASS_TEMPLATE = "Forge (1.20+) Main Class.java"
+        const val FG3_1_20_6_MAIN_CLASS_TEMPLATE = "Forge (1.20.6+) Main Class.java"
         const val FG3_1_20_CONFIG_TEMPLATE = "Forge (1.20+) Config.java"
+        const val FG3_1_21_CONFIG_TEMPLATE = "Forge (1.21+) Config.java"
         const val FG3_BUILD_GRADLE_TEMPLATE = "Forge (1.13+) build.gradle"
         const val FG3_GRADLE_PROPERTIES_TEMPLATE = "Forge (1.13+) gradle.properties"
         const val FG3_SETTINGS_GRADLE_TEMPLATE = "Forge (1.13+) settings.gradle"
@@ -249,6 +271,28 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
         const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
         const val FABRIC_STATUS_EFFECT_TEMPLATE = "FabricStatusEffect.java"
+
+        const val NEOFORGE_MIXINS_JSON_TEMPLATE = "NeoForge Mixins Config.json"
+        const val NEOFORGE_MAIN_CLASS_TEMPLATE = "NeoForge Main Class.java"
+        const val NEOFORGE_CONFIG_TEMPLATE = "NeoForge Config.java"
+        const val NEOFORGE_BUILD_GRADLE_TEMPLATE = "NeoForge build.gradle"
+        const val NEOFORGE_GRADLE_PROPERTIES_TEMPLATE = "NeoForge gradle.properties"
+        const val NEOFORGE_SETTINGS_GRADLE_TEMPLATE = "NeoForge settings.gradle"
+        const val NEOFORGE_MODS_TOML_TEMPLATE = "NeoForge mods.toml"
+        const val NEOFORGE_NEOFORGE_MODS_TOML_TEMPLATE = "NeoForge neoforge.mods.toml"
+        const val NEOFORGE_PACK_MCMETA_TEMPLATE = "NeoForge pack.mcmeta"
+
+        const val NEOFORGE_1_20_5_MAIN_CLASS_TEMPLATE = "NeoForge (1.20.5) Main Class.java"
+        const val NEOFORGE_1_20_5_CONFIG_TEMPLATE = "NeoForge (1.20.5) Config.java"
+        const val NEOFORGE_1_20_5_BUILD_GRADLE_TEMPLATE = "NeoForge (1.20.5) build.gradle"
+
+        const val NEOFORGE_1_21_CONFIG_TEMPLATE = "NeoForge (1.21) Config.java"
+
+        const val NEOFORGE_BLOCK_TEMPLATE = "NeoForgeBlock.java"
+        const val NEOFORGE_ITEM_TEMPLATE = "NeoForgeItem.java"
+        const val NEOFORGE_PACKET_TEMPLATE = "NeoForgePacket.java"
+        const val NEOFORGE_ENCHANTMENT_TEMPLATE = "NeoForgeEnchantment.java"
+        const val NEOFORGE_MOB_EFFECT_TEMPLATE = "NeoForgeMobEffect.java"
     }
 
     private fun template(fileName: String, displayName: String? = null) = CustomDescriptor(fileName, displayName)

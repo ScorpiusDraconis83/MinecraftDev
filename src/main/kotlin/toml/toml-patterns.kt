@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,9 +20,10 @@
 
 package com.demonwav.mcdev.toml
 
-import com.demonwav.mcdev.platform.forge.util.ForgeConstants
+import com.demonwav.mcdev.toml.platform.forge.ForgeTomlConstants
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PsiElementPattern
+import com.intellij.patterns.StandardPatterns
 import com.intellij.patterns.VirtualFilePattern
 import com.intellij.psi.PsiElement
 import org.toml.lang.psi.TomlKey
@@ -33,7 +34,8 @@ import org.toml.lang.psi.TomlTableHeader
 inline fun <reified E : PsiElement> inModsToml(): PsiElementPattern.Capture<E> = inModsToml(E::class.java)
 
 fun <E : PsiElement> inModsToml(clazz: Class<E>): PsiElementPattern.Capture<E> =
-    PlatformPatterns.psiElement(clazz).inVirtualFile(VirtualFilePattern().withName(ForgeConstants.MODS_TOML))
+    PlatformPatterns.psiElement(clazz)
+        .inVirtualFile(VirtualFilePattern().withName(StandardPatterns.string().oneOf(ForgeTomlConstants.FILE_NAMES)))
 
 fun inModsTomlKey(): PsiElementPattern.Capture<PsiElement> =
     inModsToml<PsiElement>().withParent(TomlKeySegment::class.java)

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,14 @@
 
 package com.demonwav.mcdev.util
 
+import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 
+@TemplateApi
 object MinecraftVersions {
     val MC1_12_2 = SemanticVersion.release(1, 12, 2)
     val MC1_14_4 = SemanticVersion.release(1, 14, 4)
+    val MC1_16 = SemanticVersion.release(1, 16)
     val MC1_16_1 = SemanticVersion.release(1, 16, 1)
     val MC1_16_5 = SemanticVersion.release(1, 16, 5)
     val MC1_17 = SemanticVersion.release(1, 17)
@@ -35,11 +38,19 @@ object MinecraftVersions {
     val MC1_19_3 = SemanticVersion.release(1, 19, 3)
     val MC1_19_4 = SemanticVersion.release(1, 19, 4)
     val MC1_20 = SemanticVersion.release(1, 20)
+    val MC1_20_1 = SemanticVersion.release(1, 20, 1)
     val MC1_20_2 = SemanticVersion.release(1, 20, 2)
+    val MC1_20_3 = SemanticVersion.release(1, 20, 3)
+    val MC1_20_4 = SemanticVersion.release(1, 20, 4)
+    val MC1_20_5 = SemanticVersion.release(1, 20, 5)
+    val MC1_20_6 = SemanticVersion.release(1, 20, 6)
+    val MC1_21 = SemanticVersion.release(1, 21)
+    val MC1_21_1 = SemanticVersion.release(1, 21, 1)
 
     fun requiredJavaVersion(minecraftVersion: SemanticVersion) = when {
         minecraftVersion <= MC1_16_5 -> JavaSdkVersion.JDK_1_8
         minecraftVersion <= MC1_17_1 -> JavaSdkVersion.JDK_16
-        else -> JavaSdkVersion.JDK_17
+        minecraftVersion <= MC1_20_4 -> JavaSdkVersion.JDK_17
+        else -> JavaSdkVersion.JDK_21
     }
 }

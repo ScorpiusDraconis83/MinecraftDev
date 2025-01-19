@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.translations.sorting
 
-import com.demonwav.mcdev.translations.lang.gen.TranslationTemplateLexer
+import com.demonwav.mcdev.translations.template.gen.TranslationTemplateLexer
 import com.intellij.lexer.FlexAdapter
 
 class TranslationTemplateLexerAdapter : FlexAdapter(TranslationTemplateLexer())

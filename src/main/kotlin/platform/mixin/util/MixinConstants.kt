@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
+
 @Suppress("MemberVisibilityCanBePrivate")
 object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
@@ -34,15 +38,19 @@ object MixinConstants {
         const val CONSTANT_CONDITION = "org.spongepowered.asm.mixin.injection.Constant.Condition"
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val SELECTOR = "org.spongepowered.asm.mixin.injection.InjectionPoint.Selector"
+        const val TARGET_SELECTOR = "org.spongepowered.asm.mixin.injection.selectors.TargetSelector"
         const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"
         const val MIXIN_CONFIG = "org.spongepowered.asm.mixin.transformer.MixinConfig"
         const val MIXIN_PLUGIN = "org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin"
         const val TARGET_SELECTOR_DYNAMIC = "org.spongepowered.asm.mixin.injection.selectors.ITargetSelectorDynamic"
         const val SELECTOR_ID = "org.spongepowered.asm.mixin.injection.selectors.ITargetSelectorDynamic.SelectorId"
         const val SHIFT = "org.spongepowered.asm.mixin.injection.At.Shift"
+        const val LOCAL_CAPTURE = "org.spongepowered.asm.mixin.injection.callback.LocalCapture"
 
         const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
         const val MIXIN_SERIALIZED_NAME = "org.spongepowered.include.$SERIALIZED_NAME"
+
+        const val FABRIC_UTIL = "org.spongepowered.asm.mixin.FabricUtil"
     }
 
     object Annotations {
@@ -77,9 +85,37 @@ object MixinConstants {
     }
 
     object MixinExtras {
+        const val PACKAGE = "com.llamalad7.mixinextras."
         const val OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.Operation"
         const val WRAP_OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation"
+        const val WRAP_METHOD = "com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod"
         const val LOCAL = "com.llamalad7.mixinextras.sugar.Local"
         const val LOCAL_REF_PACKAGE = "com.llamalad7.mixinextras.sugar.ref."
+        const val EXPRESSION = "com.llamalad7.mixinextras.expression.Expression"
+        const val DEFINITION = "com.llamalad7.mixinextras.expression.Definition"
+        const val MIXIN_EXTRAS_CONFIG = "com.llamalad7.mixinextras.config.MixinExtrasConfig"
+        const val MIXIN_EXTRAS_CONFIG_KEY = "mixinextras"
+        const val MIXIN_EXTRAS_SERIALIZED_NAME = "com.llamalad7.mixinextras.lib.gson.annotations.SerializedName"
+
+        fun PsiType.unwrapLocalRef(): PsiType {
+            if (this !is PsiClassType) {
+                return this
+            }
+            val qName = resolve()?.qualifiedName ?: return this
+            if (!qName.startsWith(LOCAL_REF_PACKAGE)) {
+                return this
+            }
+            return when (qName.substringAfterLast('.')) {
+                "LocalBooleanRef" -> PsiTypes.booleanType()
+                "LocalCharRef" -> PsiTypes.charType()
+                "LocalDoubleRef" -> PsiTypes.doubleType()
+                "LocalFloatRef" -> PsiTypes.floatType()
+                "LocalIntRef" -> PsiTypes.intType()
+                "LocalLongRef" -> PsiTypes.longType()
+                "LocalShortRef" -> PsiTypes.shortType()
+                "LocalRef" -> parameters.getOrNull(0) ?: this
+                else -> this
+            }
+        }
     }
 }

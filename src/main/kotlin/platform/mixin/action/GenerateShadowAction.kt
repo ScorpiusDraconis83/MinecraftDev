@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.MinecraftProjectSettings
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
@@ -236,6 +237,11 @@ private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifier
 }
 
 inline fun disableAnnotationWrapping(project: Project, func: () -> Unit) {
+    if (!MinecraftProjectSettings.getInstance(project).isShadowAnnotationsSameLine) {
+        func()
+        return
+    }
+
     val settings = CodeStyle.getSettings(project).getCommonSettings(JavaLanguage.INSTANCE)
     val methodWrap = settings.METHOD_ANNOTATION_WRAP
     val fieldWrap = settings.FIELD_ANNOTATION_WRAP

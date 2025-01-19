@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,27 +20,26 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
-import com.demonwav.mcdev.util.toArray
 import com.intellij.ide.util.PsiClassListCellRenderer
 import com.intellij.psi.PsiClass
 import com.intellij.ui.components.JBList
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.panel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPanel
-import javax.swing.ListModel
 
 class FindMixinsComponent(classes: List<PsiClass>) : MouseAdapter() {
 
-    private lateinit var classList: JBList<PsiClass>
-    lateinit var panel: JPanel
-        private set
+    private val classList = JBList<PsiClass>(classes).apply {
+        cellRenderer = PsiClassListCellRenderer()
+        addMouseListener(this@FindMixinsComponent)
+    }
 
-    init {
-        @Suppress("UNCHECKED_CAST")
-        classList.model = JBList.createDefaultListModel(*classes.toArray()) as ListModel<PsiClass>
-        classList.cellRenderer = PsiClassListCellRenderer()
-
-        classList.addMouseListener(this)
+    val panel: JPanel = panel {
+        row {
+            cell(classList).align(Align.FILL)
+        }
     }
 
     override fun mouseClicked(e: MouseEvent) {

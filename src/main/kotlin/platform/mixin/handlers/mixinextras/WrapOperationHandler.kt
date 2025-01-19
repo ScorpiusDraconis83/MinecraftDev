@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,23 +20,25 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.mixinExtrasOperationType
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
-import com.intellij.psi.search.GlobalSearchScope
-import org.objectweb.asm.tree.AbstractInsnNode
+import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
+import com.llamalad7.mixinextras.expression.impl.utils.ExpressionASMUtils
+import com.llamalad7.mixinextras.expression.impl.utils.ExpressionDecorations
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
     override val supportedInstructionTypes = listOf(
         InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET, InstructionType.INSTANCEOF,
-        InstructionType.INSTANTIATION
+        InstructionType.INSTANTIATION, InstructionType.SIMPLE_OPERATION
     )
 
     override fun getAtKey(annotation: PsiAnnotation): String {
@@ -47,26 +49,51 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        insn: AbstractInsnNode
+        target: TargetInsn
     ): Pair<ParameterGroup, PsiType>? {
-        val params = getPsiParameters(insn, targetClass, annotation) ?: return null
-        val returnType = getPsiReturnType(insn, annotation) ?: return null
-        val operationType = getOperationType(annotation, returnType) ?: return null
+        val params = getParameterTypes(target, targetClass, annotation) ?: return null
+        val returnType = getReturnType(target, annotation) ?: return null
+        val operationType = mixinExtrasOperationType(annotation, returnType) ?: return null
         return ParameterGroup(
             params + Parameter("original", operationType)
         ) to returnType
     }
 
-    private fun getOperationType(context: PsiElement, type: PsiType): PsiType? {
-        val project = context.project
-        val boxedType = if (type is PsiPrimitiveType) {
-            type.getBoxedType(context) ?: return null
-        } else {
-            type
+    override fun intLikeTypePositions(target: TargetInsn) = buildList {
+        if (
+            target.getDecoration<Type>(ExpressionDecorations.SIMPLE_OPERATION_RETURN_TYPE)
+            == ExpressionASMUtils.INTLIKE_TYPE
+        ) {
+            add(MethodSignature.TypePosition.Return)
         }
-        val psiClass = JavaPsiFacade.getInstance(project)
-            .findClass(MixinConstants.MixinExtras.OPERATION, GlobalSearchScope.allScope(project))
-            ?: return null
-        return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
+        target.getDecoration<Array<Type>>(ExpressionDecorations.SIMPLE_OPERATION_ARGS)?.forEachIndexed { i, it ->
+            if (it == ExpressionASMUtils.INTLIKE_TYPE) {
+                add(MethodSignature.TypePosition.Param(i))
+            }
+        }
     }
+
+    private fun getParameterTypes(
+        target: TargetInsn,
+        targetClass: ClassNode,
+        annotation: PsiAnnotation
+    ): List<Parameter>? {
+        getPsiParameters(target.insn, targetClass, annotation)?.let { return it }
+        val args = target.getDecoration<Array<Type>>(ExpressionDecorations.SIMPLE_OPERATION_ARGS) ?: return null
+        return args.toList().toParameters(
+            annotation,
+            target.getDecoration(ExpressionDecorations.SIMPLE_OPERATION_PARAM_NAMES)
+        )
+    }
+
+    private fun getReturnType(
+        target: TargetInsn,
+        annotation: PsiAnnotation
+    ): PsiType? {
+        getPsiReturnType(target.insn, annotation)?.let { return it }
+        val type = target.getDecoration<Type>(ExpressionDecorations.SIMPLE_OPERATION_RETURN_TYPE) ?: return null
+        return type.toPsiType(JavaPsiFacade.getElementFactory(annotation.project))
+    }
+
+    override val mixinExtrasExpressionContextType = ExpressionContext.Type.WRAP_OPERATION
 }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -19,6 +19,8 @@
  */
 
 package com.demonwav.mcdev.asset
+
+import com.intellij.util.IconUtil
 
 @Suppress("unused")
 object PlatformAssets : Assets() {
@@ -61,6 +63,9 @@ object PlatformAssets : Assets() {
     val MIXIN_ICON_2X = loadIcon("/assets/icons/platform/Mixins@2x.png")
     val MIXIN_ICON_DARK = loadIcon("/assets/icons/platform/Mixins_dark.png")
     val MIXIN_ICON_2X_DARK = loadIcon("/assets/icons/platform/Mixins@2x_dark.png")
+
+    val NEOFORGE_ICON = IconUtil.scale(loadIcon("/assets/icons/platform/NeoForge.png"), null, 0.125f)
+    val NEOFORGE_ICON_2X = IconUtil.scale(loadIcon("/assets/icons/platform/NeoForge.png"), null, 0.25f)
 
     val MCP_ICON = loadIcon("/assets/icons/platform/MCP.png")
     val MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png")

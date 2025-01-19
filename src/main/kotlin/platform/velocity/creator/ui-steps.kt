@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -95,6 +95,7 @@ class VelocityVersionStep(
     private fun applyJdkVersion() {
         SemanticVersion.tryParse(version)?.let { version ->
             val preferredJdk = when {
+                version >= SemanticVersion.release(3, 3) -> JavaSdkVersion.JDK_17
                 version >= SemanticVersion.release(3) -> JavaSdkVersion.JDK_11
                 else -> JavaSdkVersion.JDK_1_8
             }

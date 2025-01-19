@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -39,6 +39,7 @@ import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
+import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -104,6 +105,8 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
     }
 
     override val allowCoerce = true
+
+    override val mixinExtrasExpressionContextType = ExpressionContext.Type.REDIRECT
 
     private interface RedirectType {
         fun isInsnAllowed(node: AbstractInsnNode) = true

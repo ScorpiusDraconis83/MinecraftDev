@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -126,7 +126,9 @@ class JdkProjectSetupFinalizer(
     private var preferredJdkLabel: Placeholder? = null
     private var preferredJdkReason = MCDevBundle("creator.validation.jdk_preferred_default_reason")
 
-    var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
+    val preferredJdkProperty = propertyGraph.property(JavaSdkVersion.JDK_17)
+
+    var preferredJdk: JavaSdkVersion by preferredJdkProperty
         private set
 
     fun setPreferredJdk(value: JavaSdkVersion, reason: String) {

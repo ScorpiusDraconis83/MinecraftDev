@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,12 +27,12 @@ import com.intellij.facet.ui.FacetEditorTab
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.not
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.util.ui.UIUtil
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -49,6 +49,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
     val paper = platformState(PlatformType.PAPER)
     val sponge = platformState(PlatformType.SPONGE)
     val forge = platformState(PlatformType.FORGE)
+    val neoforge = platformState(PlatformType.NEOFORGE)
     val fabric = platformState(PlatformType.FABRIC)
     val architectury = platformState(PlatformType.ARCHITECTURY)
     val mcp = platformState(PlatformType.MCP)
@@ -84,7 +85,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                 { afterChange { _ -> all(this, bukkit.auto, spigot.auto)(bukkit, spigot, paper) } },
             )
 
-            val isDarkMode = UIUtil.isUnderDarcula()
+            val isDarkMode = !JBColor.isBright()
             val spongeIcon = if (isDarkMode) PlatformAssets.SPONGE_ICON_2X_DARK else PlatformAssets.SPONGE_ICON_2X
             createRow(sponge, "Sponge", spongeIcon)
 
@@ -102,6 +103,8 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                     }
                 },
             )
+
+            createRow(neoforge, "NeoForge", PlatformAssets.NEOFORGE_ICON_2X)
 
             createRow(
                 fabric, "Fabric", PlatformAssets.FABRIC_ICON_2X,

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -108,6 +108,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         }
 
         val mainClassTemplate = when {
+            mcVersion >= MinecraftVersions.MC1_20_6 -> MinecraftTemplates.FG3_1_20_6_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_20 -> MinecraftTemplates.FG3_1_20_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_19_3 -> MinecraftTemplates.FG3_1_19_3_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_19 -> MinecraftTemplates.FG3_1_19_MAIN_CLASS_TEMPLATE
@@ -124,6 +125,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         )
 
         val configTemplate = when {
+            mcVersion >= MinecraftVersions.MC1_21 -> MinecraftTemplates.FG3_1_21_CONFIG_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_20 -> MinecraftTemplates.FG3_1_20_CONFIG_TEMPLATE
             else -> null
         }

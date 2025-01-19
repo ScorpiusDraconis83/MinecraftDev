@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -43,6 +43,15 @@ object HardcodedYarnToMojmap {
                 owner = "net.minecraft.network.chat.Component",
                 name = "translatableEscape",
                 descriptor = "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"
+            ),
+            MemberReference(
+                owner = "net.minecraft.client.resource.language.I18n",
+                name = "translate",
+                descriptor = "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+            ) mapTo MemberReference(
+                owner = "net.minecraft.client.resources.language.I18n",
+                name = "get",
+                descriptor = "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
             )
         ),
         hashMapOf(),

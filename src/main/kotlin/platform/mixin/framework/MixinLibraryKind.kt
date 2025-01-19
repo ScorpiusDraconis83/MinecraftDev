@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -23,4 +23,4 @@ package com.demonwav.mcdev.platform.mixin.framework
 import com.demonwav.mcdev.util.libraryKind
 import com.intellij.openapi.roots.libraries.LibraryKind
 
-val MIXIN_LIBRARY_KIND: LibraryKind = libraryKind("mixin-library")
+val MIXIN_LIBRARY_KIND: LibraryKind by libraryKind("mixin-library")

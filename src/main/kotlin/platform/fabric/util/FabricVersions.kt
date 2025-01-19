@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.util
 
+import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.SemanticVersion
@@ -36,6 +37,7 @@ class FabricVersions(val game: List<Game>, val mappings: List<Mappings>, val loa
     class Game(val version: String, val stable: Boolean)
     class Mappings(val gameVersion: String, val version: YarnVersion)
 
+    @TemplateApi
     class YarnVersion(val name: String, val build: Int) : Comparable<YarnVersion> {
         override fun toString() = name
         override fun compareTo(other: YarnVersion) = build.compareTo(other.build)

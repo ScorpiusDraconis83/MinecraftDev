@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -32,15 +32,21 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseMinecraftTest(
     vararg platformTypes: PlatformType,
 ) : ProjectBuilderTest(
     getProjectDescriptor(platformTypes),
 ) {
-    protected open val resourcePath = "src/test/resources"
-    protected open val packagePath = "com/demonwav/mcdev"
-    protected open val dataPath = ""
+    protected open val testPath = ""
+
+    @BeforeEach
+    fun setUp() {
+        if (testPath.isNotBlank()) {
+            fixture.testDataPath = "$BASE_DATA_PATH/$testPath"
+        }
+    }
 }
 
 fun getProjectDescriptor(platformTypes: Array<out PlatformType>): LightProjectDescriptor {

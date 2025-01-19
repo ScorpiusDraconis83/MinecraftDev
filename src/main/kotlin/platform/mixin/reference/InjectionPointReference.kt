@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT_CODE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
@@ -86,20 +87,31 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
     override fun collectVariants(context: PsiElement): Array<Any> {
         return (
             getAllAtCodes(context.project).keys.asSequence()
+                .filter {
+                    InjectionPoint.byAtCode(it)?.discouragedMessage == null
+                }
                 .map {
                     PrioritizedLookupElement.withPriority(
-                        LookupElementBuilder.create(it).completeToLiteral(context),
+                        LookupElementBuilder.create(it).completeInjectionPoint(context),
                         1.0,
                     )
                 } +
                 getCustomInjectionPointInheritors(context.project).asSequence()
                     .map {
                         PrioritizedLookupElement.withPriority(
-                            LookupElementBuilder.create(it).completeToLiteral(context),
+                            LookupElementBuilder.create(it).completeInjectionPoint(context),
                             0.0,
                         )
                     }
             ).toTypedArray()
+    }
+
+    private fun LookupElementBuilder.completeInjectionPoint(context: PsiElement): LookupElementBuilder {
+        val injectionPoint = InjectionPoint.byAtCode(lookupString) ?: return completeToLiteral(context)
+
+        return completeToLiteral(context) { editor, element ->
+            injectionPoint.onCompleted(editor, element)
+        }
     }
 
     private val SLICE_SELECTORS_KEY = Key<CachedValue<List<String>>>("mcdev.sliceSelectors")

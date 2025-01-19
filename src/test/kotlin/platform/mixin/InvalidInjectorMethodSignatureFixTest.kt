@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,7 +33,7 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
     private fun doTest(testName: String) {
         fixture.enableInspections(InvalidInjectorMethodSignatureInspection::class)
-        testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method parameters")
+        testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method signature")
     }
 
     @Test

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -69,7 +69,9 @@ fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
 }
 
 val PsiType.descriptor
-    get() = appendDescriptor(StringBuilder()).toString()
+    get() = erasure().appendDescriptor(StringBuilder()).toString()
+
+private fun PsiType.erasure() = TypeConversionUtil.erasure(this)!!
 
 fun getPrimitiveWrapperClass(internalName: Char, project: Project): PsiClass? {
     val type = getPrimitiveType(internalName) ?: return null

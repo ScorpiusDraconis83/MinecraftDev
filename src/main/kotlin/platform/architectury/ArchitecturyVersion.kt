@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -29,21 +29,13 @@ import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import java.io.IOException
 
 class ArchitecturyVersion private constructor(
     val versions: Map<SemanticVersion, List<SemanticVersion>>,
 ) {
 
     fun getArchitecturyVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
-        return try {
-            val architecturyVersions = versions[mcVersion]
-                ?: throw IOException("Could not find any architectury versions for $mcVersion")
-            architecturyVersions.take(50)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            emptyList()
-        }
+        return versions[mcVersion].orEmpty().take(50)
     }
 
     data class ModrinthVersionApi(

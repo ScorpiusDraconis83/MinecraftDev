@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -78,7 +78,7 @@ private class GetterReference(element: PsiLanguageInjectionHost) : PsiReferenceB
     }
 
     override fun getVariants(): Array<Any> {
-        val literal = element.toUElementOfType<ULiteralExpression>() ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        val literal = element.toUElement() ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val (eventClass, _) = literal.uastEventListener
             ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val methodByClass = mutableMapOf<String, Pair<PsiMethod, PsiClass>>()

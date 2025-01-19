@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -117,6 +117,13 @@ fun Module.getMappedMethod(mojangMethod: MemberReference): String {
 
 fun Module.getMappedMethod(mojangClass: String, mojangMethod: String, mojangDescriptor: String): String {
     return getMappedMethod(MemberReference(mojangMethod, mojangDescriptor, mojangClass))
+}
+
+fun Module.getMappedMethodCall(mojangClass: String, mojangMethod: String, mojangDescriptor: String, p: String): String {
+    val mappedMethodRef = namedToMojang?.tryGetMappedMethod(
+        MemberReference(mojangMethod, mojangDescriptor, mojangClass)
+    ) ?: return "$mojangClass.$mojangMethod($p)"
+    return "${mappedMethodRef.owner}.${mappedMethodRef.name}($p)"
 }
 
 fun Module.getMojangMethod(mappedMethod: MemberReference): String {

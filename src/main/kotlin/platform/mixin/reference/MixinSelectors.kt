@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -48,10 +48,10 @@ import com.demonwav.mcdev.util.resolveTypeArray
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
@@ -61,6 +61,7 @@ import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedMembersSearch
+import com.intellij.psi.search.searches.MethodReferencesSearch
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
@@ -121,6 +122,10 @@ interface MixinSelector {
 
     fun matchMethod(method: MethodNode, qualifier: ClassNode): Boolean {
         return matchMethod(qualifier.name, method.name, method.desc)
+    }
+
+    fun getCustomOwner(owner: ClassNode): ClassNode {
+        return owner
     }
 
     /**
@@ -222,66 +227,7 @@ fun MemberReference.toMixinString(): String {
 }
 
 class MixinMemberParser : MixinSelectorParser {
-    override fun parse(value: String, context: PsiElement): MixinSelector? {
-        val reference = value.replace(" ", "")
-        val owner: String?
-
-        var pos = reference.lastIndexOf('.')
-        if (pos != -1) {
-            // Everything before the dot is the qualifier/owner
-            owner = reference.substring(0, pos).replace('/', '.')
-        } else {
-            pos = reference.indexOf(';')
-            if (pos != -1 && reference.startsWith('L')) {
-                val internalOwner = reference.substring(1, pos)
-                if (!StringUtil.isJavaIdentifier(internalOwner.replace('/', '_'))) {
-                    // Invalid: Qualifier should only contain slashes
-                    return null
-                }
-
-                owner = internalOwner.replace('/', '.')
-            } else {
-                // No owner/qualifier specified
-                pos = -1
-                owner = null
-            }
-        }
-
-        val descriptor: String?
-        val name: String
-        val matchAllNames = reference.getOrNull(pos + 1) == '*'
-        val matchAllDescs: Boolean
-
-        // Find descriptor separator
-        val methodDescPos = reference.indexOf('(', pos + 1)
-        if (methodDescPos != -1) {
-            // Method descriptor
-            descriptor = reference.substring(methodDescPos)
-            name = reference.substring(pos + 1, methodDescPos)
-            matchAllDescs = false
-        } else {
-            val fieldDescPos = reference.indexOf(':', pos + 1)
-            if (fieldDescPos != -1) {
-                descriptor = reference.substring(fieldDescPos + 1)
-                name = reference.substring(pos + 1, fieldDescPos)
-                matchAllDescs = false
-            } else {
-                descriptor = null
-                matchAllDescs = reference.endsWith('*')
-                name = if (matchAllDescs) {
-                    reference.substring(pos + 1, reference.lastIndex)
-                } else {
-                    reference.substring(pos + 1)
-                }
-            }
-        }
-
-        if (!matchAllNames && !StringUtil.isJavaIdentifier(name) && name != "<init>" && name != "<clinit>") {
-            return null
-        }
-
-        return MemberReference(if (matchAllNames) "*" else name, descriptor, owner, matchAllNames, matchAllDescs)
-    }
+    override fun parse(value: String, context: PsiElement) = MemberReference.parse(value)
 }
 
 // Regex reference
@@ -412,19 +358,56 @@ private fun getAllDynamicSelectors(project: Project): Set<String> {
             val annotation = member.findAnnotation(MixinConstants.Classes.SELECTOR_ID) ?: return@flatMap emptySequence()
             val value = annotation.findAttributeValue("value")?.constantStringValue
                 ?: return@flatMap emptySequence()
-            val namespace = annotation.findAttributeValue("namespace")?.constantStringValue
+            var namespace = annotation.findAttributeValue("namespace")?.constantStringValue
             if (namespace.isNullOrEmpty()) {
                 val builtinPrefix = "org.spongepowered.asm.mixin.injection.selectors."
                 if (member.qualifiedName?.startsWith(builtinPrefix) == true) {
                     sequenceOf(value, "mixin:$value")
                 } else {
-                    sequenceOf(value)
+                    namespace = findNamespace(project, member)
+                    if (namespace != null) {
+                        sequenceOf("$namespace:$value")
+                    } else {
+                        sequenceOf(value)
+                    }
                 }
             } else {
                 sequenceOf("$namespace:$value")
             }
         }.toSet()
     }
+}
+
+/**
+ * Dynamic selectors don't have to declare their namespace in the annotation,
+ * so instead we look for the registration call and extract the namespace from there.
+ */
+private fun findNamespace(
+    project: Project,
+    member: PsiClass
+): String? {
+    val targetSelector = JavaPsiFacade.getInstance(project)
+        .findClass(MixinConstants.Classes.TARGET_SELECTOR, GlobalSearchScope.allScope(project))
+    val registerMethod = targetSelector?.findMethodsByName("register", false)?.firstOrNull() ?: return null
+
+    val query = MethodReferencesSearch.search(registerMethod)
+    val usages = query.findAll()
+    for (usage in usages) {
+        val element = usage.element
+        val callExpression = PsiTreeUtil.getParentOfType(element, PsiCallExpression::class.java) ?: continue
+        val args = callExpression.argumentList ?: continue
+        if (args.expressions.size != 2) continue
+
+        // is the registered selector the one we're checking?
+        val selectorName = args.expressions[0].text.removeSuffix(".class")
+        if (selectorName != member.name) continue
+
+        val namespaceArg = args.expressions[1].text.removeSurrounding("\"")
+        if (namespaceArg.isEmpty()) continue
+
+        return namespaceArg
+    }
+    return null
 }
 
 private val DYNAMIC_SELECTOR_PATTERN = "(?i)^@([a-z]+(:[a-z]+)?)(\\((.*)\\))?$".toRegex()

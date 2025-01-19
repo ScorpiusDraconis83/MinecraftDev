@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,10 +22,12 @@ package com.demonwav.mcdev.util
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.application.AppUIExecutor
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
@@ -40,14 +42,18 @@ import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
+import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.lang.invoke.MethodHandles
 import java.util.Locale
+import java.util.concurrent.CancellationException
 import kotlin.math.min
 import kotlin.reflect.KClass
+import org.jetbrains.annotations.NonNls
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
 
@@ -106,6 +112,10 @@ fun <T> invokeEdt(block: () -> T): T {
     return AppUIExecutor.onUiThread().submit(block).get()
 }
 
+inline fun <T> runWriteActionAndWait(crossinline action: () -> T): T {
+    return WriteAction.computeAndWait(ThrowableComputable { action() })
+}
+
 inline fun <T : Any?> PsiFile.runWriteAction(crossinline func: () -> T) =
     applyWriteAction { func() }
 
@@ -130,6 +140,11 @@ fun waitForAllSmart() {
         }
     }
 }
+
+inline fun <reified T : InspectionProfileEntry> Project.findInspection(@NonNls shortName: String): T? =
+    InspectionProfileManager.getInstance(this)
+        .currentProfile.getInspectionTool(shortName, this)
+        ?.tool as? T
 
 /**
  * Returns an untyped array for the specified [Collection].
@@ -347,7 +362,8 @@ inline fun <reified T> Iterable<*>.firstOfType(): T? {
     return this.firstOrNull { it is T } as? T
 }
 
-fun libraryKind(id: String): LibraryKind = LibraryKindRegistry.getInstance().findKindById(id) ?: LibraryKind.create(id)
+fun libraryKind(id: String): Lazy<LibraryKind> =
+    lazy { LibraryKindRegistry.getInstance().findKindById(id) ?: LibraryKind.create(id) }
 
 fun String.capitalize(): String =
     replaceFirstChar {
@@ -378,6 +394,19 @@ inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
     }
 }
 
+fun <T> Result<T>.getOrLogException(logger: Logger): T? {
+    return getOrLogException<T>(logger::error)
+}
+
+inline fun <T> Result<T>.getOrLogException(log: (Throwable) -> Unit): T? {
+    return onFailure { e ->
+        if (e is ProcessCanceledException || e is CancellationException) {
+            throw e
+        }
+        log(e)
+    }.getOrNull()
+}
+
 fun <T : Throwable> withSuppressed(original: T?, other: T): T =
     original?.apply { addSuppressed(other) } ?: other
 
@@ -387,4 +416,12 @@ fun <S : CharSequence, R> S.ifNotBlank(block: (S) -> R): R? {
     }
 
     return null
+}
+
+inline fun <reified T : Enum<T>> enumValueOfOrNull(str: String): T? {
+    return try {
+        enumValueOf<T>(str)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
 }

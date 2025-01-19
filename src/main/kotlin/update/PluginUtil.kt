@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -30,7 +30,7 @@ object PluginUtil {
     val plugin: IdeaPluginDescriptor
         get() {
             return PluginManagerCore.getPlugin(PLUGIN_ID)
-                ?: error("Minecraft Development plugin not found: " + PluginManagerCore.getPlugins().contentToString())
+                ?: error("Minecraft Development plugin not found: " + PluginManagerCore.plugins.contentToString())
         }
 
     val pluginVersion: String

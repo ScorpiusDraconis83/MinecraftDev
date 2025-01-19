@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2025 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -52,7 +52,7 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
     val groupIdProperty = propertyGraph.property("org.example")
         .bindStorage("${javaClass.name}.groupId")
     val artifactIdProperty = propertyGraph.lazyProperty(::suggestArtifactId)
-    private val versionProperty = propertyGraph.property("1.0-SNAPSHOT")
+    val versionProperty = propertyGraph.property("1.0-SNAPSHOT")
         .bindStorage("${javaClass.name}.version")
 
     var groupId by groupIdProperty
